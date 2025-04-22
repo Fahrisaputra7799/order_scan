@@ -105,7 +105,7 @@ export default function HomePage() {
       </div>
 
       {/* Category */}
-      <div className="sticky top-[180px] z-10 bg-white border-b">
+      <div className="sticky top-[63.2px] z-10 bg-white border-b">
         <div className="flex overflow-x-auto px-4 py-2 gap-2 scrollbar-hide">
           {categories.map((category) => (
             <button
