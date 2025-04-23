@@ -86,10 +86,14 @@ export default function HomePage() {
           <Menu size={22} className="text-gray-800" />
         </button>
         <h1 className="text-lg font-bold text-gray-900">meetSteak</h1>
-        <div className="relative">
-          <ShoppingCart className="text-gray-800" />
-          {/* badge cart */}
-        </div>
+          <div className="relative">
+           <ShoppingCart className="text-gray-800" />
+           {totalItems > 0 && (
+              <span className="absolute -top-2 -right-2 text-xs bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full">
+                {totalItems}
+              </span>
+            )}
+          </div>
       </header>
 
       <div className="mt-16 px-4 py-2 space-y-4">
@@ -234,14 +238,7 @@ export default function HomePage() {
 //           <Menu size={22} className="text-gray-800" />
 //         </button>
 //         <h1 className="text-lg font-bold text-gray-900">meetSteak</h1>
-//         <div className="relative">
-//           <ShoppingCart className="text-gray-800" />
-//           {totalItems > 0 && (
-//             <span className="absolute -top-2 -right-2 text-xs bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full">
-//               {totalItems}
-//             </span>
-//           )}
-//         </div>
+
 //       </header>
 
 //       <div className="mt-16 px-4 py-1">
