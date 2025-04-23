@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 
 type CartItem = {
   id: number;
@@ -12,25 +12,45 @@ type CartItem = {
 };
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { id: 1, name: 'Nasi Goreng Spesial', price: 25000, quantity: 1 },
-    { id: 2, name: 'Es Teh Manis', price: 7000, quantity: 2 },
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  useEffect(() => {
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) {
+      // Perbaikan: normalisasi qty -> quantity
+      const parsedCart = JSON.parse(storedCart).map((item: any) => ({
+        ...item,
+        quantity: item.qty ?? item.quantity ?? 1, // fallback qty/quantity
+      }));
+      setCartItems(parsedCart);
+    }
+  }, []);
+  
+  
 
   const updateQuantity = (id: number, amount: number) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: item.quantity + amount }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
+    const updatedCart = cartItems
+      .map((item) =>
+        item.id === id
+          ? { ...item, quantity: Math.max(item.quantity + amount, 0) }
+          : item
+      )
+      .filter((item) => item.quantity > 0);
+
+    setCartItems(updatedCart);
+    localStorage.setItem(
+      'cart',
+      JSON.stringify(updatedCart.map((item) => ({ ...item, qty: item.quantity })))
     );
   };
 
   const removeItem = (id: number) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+    const updatedCart = cartItems.filter((item) => item.id !== id);
+    setCartItems(updatedCart);
+    localStorage.setItem(
+      'cart',
+      JSON.stringify(updatedCart.map((item) => ({ ...item, qty: item.quantity })))
+    );
   };
 
   const subtotal = cartItems.reduce(
@@ -56,21 +76,23 @@ export default function CartPage() {
           cartItems.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl shadow-lg p-6 flex justify-between items-start"
+              className="bg-white rounded-xl shadow-lg p-6 flex justify-between items-center gap-6"
             >
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-800">{item.name}</h3>
+                <h3 className="font-semibold text-gray-800 text-xl">{item.name}</h3>
                 <p className="text-sm text-gray-500">
                   Rp {item.price.toLocaleString('id-ID')}
                 </p>
-                <div className="flex items-center gap-4 mt-3">
+                <div className="flex items-center gap-3 mt-3">
                   <button
                     onClick={() => updateQuantity(item.id, -1)}
                     className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition"
                   >
                     <Minus size={18} />
                   </button>
-                  <span className="text-lg font-medium text-black">{item.quantity}</span>
+                  <span className="text-lg font-medium text-black">
+                    {item.quantity}
+                  </span>
                   <button
                     onClick={() => updateQuantity(item.id, 1)}
                     className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition"
